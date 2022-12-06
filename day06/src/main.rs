@@ -5,15 +5,7 @@ fn find_message(stream: &[char], marker_size: usize) -> String {
     stream
         .windows(marker_size)
         .enumerate()
-        .find_map(|(i, window)| {
-            (window
-                .iter()
-                .map(|c| (1 << (*c as u32 - 'a' as u32)) as u32)
-                .fold(0, |a, c| a | c)
-                .count_ones()
-                == marker_size as u32)
-                .then_some(i + marker_size)
-        })
+        .find_map(|(i, window)| (window.iter().all_unique()).then_some(i + marker_size))
         .unwrap()
         .to_string()
 }
