@@ -13,8 +13,7 @@ fn main() -> Result<()> {
             .find_map(|(i, w)| (w
                 .iter()
                 .map(|c| (1 << (u32::from(*c) - 'a' as u32)) as usize)
-                .reduce(|a, c| a | c)
-                .unwrap()
+                .fold(0, |a, c| a | c)
                 .count_ones()
                 == 4)
                 .then_some(i + 4))
@@ -30,8 +29,7 @@ fn main() -> Result<()> {
             .find_map(|(i, w)| (w
                 .iter()
                 .map(|c| (1 << (u32::from(*c) - 'a' as u32)) as usize)
-                .reduce(|a, c| a | c)
-                .unwrap()
+                .fold(0, |a, c| a | c)
                 .count_ones()
                 == 14)
                 .then_some(i + 14))
