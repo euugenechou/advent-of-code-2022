@@ -22,7 +22,7 @@ fn main() -> Result<()> {
     );
 
     println!(
-        "part 1: {}",
+        "part 2: {}",
         chars
             .windows(14)
             .enumerate()
