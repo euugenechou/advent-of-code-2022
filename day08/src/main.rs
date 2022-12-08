@@ -1,47 +1,33 @@
 use anyhow::Result;
-use itertools::{iproduct, izip, Itertools};
+use itertools::{iproduct, Itertools};
 use std::fs;
 
-fn eval_direction(
-    (r, c): (usize, usize),
-    range: impl Iterator<Item = (usize, usize)>,
-    trees: &[Vec<usize>],
-) -> (bool, usize) {
-    let mut visible = true;
-    let mut score = 0;
-
-    for (i, j) in range.into_iter() {
-        score += 1;
-        if trees[i][j] >= trees[r][c] {
-            visible = false;
-            break;
-        }
-    }
-
-    (visible, score)
+fn views((r, c): (usize, usize), trees: &[Vec<usize>]) -> Vec<Vec<usize>> {
+    vec![
+        (0..r).rev().map(|i| trees[i][c]).collect_vec(),
+        (0..c).rev().map(|i| trees[r][i]).collect_vec(),
+        (r + 1..trees.len()).map(|i| trees[i][c]).collect_vec(),
+        (c + 1..trees[0].len()).map(|i| trees[r][i]).collect_vec(),
+    ]
 }
 
-fn eval((r, c): (usize, usize), trees: &[Vec<usize>]) -> (bool, usize) {
-    let top = eval_direction((r, c), izip!((0..r).rev(), [c].into_iter().cycle()), &trees);
+fn is_visible((r, c): (usize, usize), trees: &[Vec<usize>]) -> bool {
+    views((r, c), trees)
+        .iter()
+        .map(|view| (view.iter().all(|tree| *tree < trees[r][c])))
+        .any(|visible| visible)
+}
 
-    let left = eval_direction((r, c), izip!([r].into_iter().cycle(), (0..c).rev()), &trees);
-
-    let bottom = eval_direction(
-        (r, c),
-        izip!(r + 1..trees.len(), [c].into_iter().cycle()),
-        &trees,
-    );
-
-    let right = eval_direction(
-        (r, c),
-        izip!([r].into_iter().cycle(), c + 1..trees[0].len()),
-        &trees,
-    );
-
-    let visible = top.0 || left.0 || bottom.0 || right.0;
-    let score = top.1 * left.1 * bottom.1 * right.1;
-
-    (visible, score)
+fn scenic_score((r, c): (usize, usize), trees: &[Vec<usize>]) -> usize {
+    views((r, c), trees)
+        .iter()
+        .map(|view| {
+            view.iter()
+                .position(|tree| *tree >= trees[r][c])
+                .map(|i| i + 1)
+                .unwrap_or(view.len())
+        })
+        .product()
 }
 
 fn main() -> Result<()> {
@@ -60,8 +46,7 @@ fn main() -> Result<()> {
         "part 1: {}",
         iproduct!(0..trees.len(), 0..trees[0].len())
             .into_iter()
-            .map(|coord| eval(coord, &trees))
-            .filter(|e| e.0)
+            .filter(|&pos| is_visible(pos, &trees))
             .count()
     );
 
@@ -69,8 +54,7 @@ fn main() -> Result<()> {
         "part 2: {}",
         iproduct!(0..trees.len(), 0..trees[0].len())
             .into_iter()
-            .map(|coord| eval(coord, &trees))
-            .map(|e| e.1)
+            .map(|pos| scenic_score(pos, &trees))
             .max()
             .unwrap()
     );
