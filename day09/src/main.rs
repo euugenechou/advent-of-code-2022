@@ -1,23 +1,15 @@
 use anyhow::Result;
 use itertools::Itertools;
 use maplit::{hashmap, hashset};
-use std::{cmp::Ordering, fs};
+use std::fs;
 
 fn drag(from: (isize, isize), delta: (isize, isize)) -> (isize, isize) {
     (from.0 + delta.0, from.1 + delta.1)
 }
 
-fn clamp(n: isize) -> isize {
-    match n.cmp(&0) {
-        Ordering::Less => -1,
-        Ordering::Equal => 0,
-        Ordering::Greater => 1,
-    }
-}
-
 fn separated((x1, y1): (isize, isize), (x2, y2): (isize, isize)) -> Option<(isize, isize)> {
     let (dx, dy) = (x1 - x2, y1 - y2);
-    (dx.abs().max(dy.abs()) > 1).then_some((clamp(dx), clamp(dy)))
+    (dx.abs().max(dy.abs()) > 1).then_some((dx.signum(), dy.signum()))
 }
 
 fn simulate(knots: usize, motions: &[(&str, isize)]) -> usize {
