@@ -1,6 +1,6 @@
 use anyhow::Result;
 use itertools::{iproduct, Itertools};
-use std::fs;
+use std::{convert::identity, fs};
 
 fn views((r, c): (usize, usize), trees: &[Vec<usize>]) -> Vec<Vec<usize>> {
     vec![
@@ -15,7 +15,7 @@ fn is_visible((r, c): (usize, usize), trees: &[Vec<usize>]) -> bool {
     views((r, c), trees)
         .iter()
         .map(|view| (view.iter().all(|tree| *tree < trees[r][c])))
-        .any(|visible| visible)
+        .any(identity)
 }
 
 fn scenic_score((r, c): (usize, usize), trees: &[Vec<usize>]) -> usize {
