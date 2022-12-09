@@ -36,8 +36,8 @@ fn simulate(knots: usize, motions: &[(&str, isize)]) -> usize {
             knots[0] = drag(knots[0], directions[dir]);
 
             for i in 1..knots.len() {
-                if let Some(offset) = separated(knots[i - 1], knots[i]) {
-                    knots[i] = drag(knots[i], offset);
+                if let Some(delta) = separated(knots[i - 1], knots[i]) {
+                    knots[i] = drag(knots[i], delta);
                 }
             }
 
