@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.66"
-maplit = "1.0.2"
+itertools = "0.10.5"
 regex = "1.7.0"

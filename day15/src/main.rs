@@ -1,4 +1,5 @@
 use anyhow::Result;
+use itertools::Itertools;
 use regex::Regex;
 use std::{collections::HashSet, convert::identity, io};
 
@@ -50,25 +51,21 @@ fn part2(sensors: &HashSet<(Pos, isize)>) -> isize {
 fn main() -> Result<()> {
     let input = io::read_to_string(io::stdin())?;
 
-    let re = Regex::new(
-        r"Sensor at x=(?P<sx>-?\d+), y=(?P<sy>-?\d+): closest beacon is at x=(?P<bx>-?\d+), y=(?P<by>-?\d+)",
-    )?;
-
+    let re = Regex::new(r"-?\d+")?;
     let mut sensors = HashSet::new();
     let mut beacons = HashSet::new();
 
     input
         .lines()
-        .filter_map(|line| re.captures(line))
-        .for_each(|cap| {
-            let sensor = (
-                cap.name("sx").unwrap().as_str().parse::<isize>().unwrap(),
-                cap.name("sy").unwrap().as_str().parse::<isize>().unwrap(),
-            );
-            let beacon = (
-                cap.name("bx").unwrap().as_str().parse::<isize>().unwrap(),
-                cap.name("by").unwrap().as_str().parse::<isize>().unwrap(),
-            );
+        .map(|line| {
+            re.captures_iter(line)
+                .flat_map(|cap| cap.get(0).map(|cap| cap.as_str()))
+                .filter_map(|n| n.parse::<isize>().ok())
+                .collect_vec()
+        })
+        .for_each(|nums| {
+            let sensor = (nums[0], nums[1]);
+            let beacon = (nums[2], nums[3]);
             sensors.insert((sensor, distance(&sensor, &beacon)));
             beacons.insert(beacon);
         });
