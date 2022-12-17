@@ -59,7 +59,7 @@ fn main() -> Result<()> {
         .lines()
         .map(|line| {
             re.captures_iter(line)
-                .flat_map(|cap| cap.get(0).map(|cap| cap.as_str()))
+                .flat_map(|cap| cap.get(0).map(|mat| mat.as_str()))
                 .filter_map(|n| n.parse::<isize>().ok())
                 .collect_vec()
         })
