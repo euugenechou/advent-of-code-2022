@@ -13,17 +13,16 @@ fn inbounds(pos: Pos, bounds: Pos) -> bool {
     r_ok && c_ok
 }
 
-fn possible_positions((r, c): Pos) -> Vec<Pos> {
+fn possible_positions((r, c): Pos) -> impl Iterator<Item = Pos> {
     [(-1, 0), (1, 0), (0, -1), (0, 1), (0, 0)]
-        .iter()
-        .map(|(dr, dc)| (r + dr, c + dc))
-        .collect()
+        .into_iter()
+        .map(move |(dr, dc)| (r + dr, c + dc))
 }
 
-fn blizzard_positions((r, c): Pos, time: isize, bounds: Pos) -> Vec<(char, Pos)> {
+fn blizzard_positions((r, c): Pos, time: isize, bounds: Pos) -> impl Iterator<Item = (char, Pos)> {
     [('>', (0, 1)), ('<', (0, -1)), ('^', (-1, 0)), ('v', (1, 0))]
         .iter()
-        .map(|(dir, (dr, dc))| {
+        .map(move |(dir, (dr, dc))| {
             (
                 *dir,
                 (
@@ -32,7 +31,6 @@ fn blizzard_positions((r, c): Pos, time: isize, bounds: Pos) -> Vec<(char, Pos)>
                 ),
             )
         })
-        .collect()
 }
 
 fn gcd(mut a: isize, mut b: isize) -> isize {
@@ -67,8 +65,7 @@ fn bfs(
             if (nr, nc) == start
                 || inbounds((nr, nc), bounds)
                     && !blizzard_positions((nr, nc), time + 1, bounds)
-                        .iter()
-                        .any(|(dir, pos)| blizzards[dir].contains(pos))
+                        .any(|(dir, pos)| blizzards[&dir].contains(&pos))
             {
                 {
                     let state = ((nr, nc), (time + 1) % period);
