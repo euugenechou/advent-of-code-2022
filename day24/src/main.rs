@@ -26,17 +26,13 @@ fn blizzard_positions((r, c): Pos, time: isize, bounds: Pos) -> Vec<(char, Pos)>
         .map(|(dir, (dr, dc))| {
             (
                 *dir,
-                (wrap(r, dr * time, bounds.0), wrap(c, dc * time, bounds.1)),
+                (
+                    (r - dr * time).rem_euclid(bounds.0),
+                    (c - dc * time).rem_euclid(bounds.1),
+                ),
             )
         })
         .collect()
-}
-
-fn wrap(mut x: isize, offset: isize, modulus: isize) -> isize {
-    while x < offset {
-        x += modulus;
-    }
-    (x - offset) % modulus
 }
 
 fn gcd(mut a: isize, mut b: isize) -> isize {
